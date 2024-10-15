@@ -1,0 +1,4 @@
+ADMIN LOGINS
+username: admin  
+email: admin@mail.com
+password: password123
