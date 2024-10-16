@@ -1,10 +1,10 @@
-import { Children, useEffect } from "react"
+import { useEffect } from "react"
 import { useState } from "react"
 import {ACCESS_TOKEN, REFRESH_TOKEN} from '../constants'
 import { Navigate } from "react-router-dom"
 import { jwtDecode } from "jwt-decode"
 
-export function ProtectedRoute(){
+export function ProtectedRoute({children}){
     const [isAuthorized, setIsAuthorized] = useState(null)
 
     useEffect(()=>{
