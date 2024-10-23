@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import AbstractUser, BaseUserManager  # Add BaseUserManager here
 
 class User(AbstractUser):
     GENDER_OPTIONS = [
@@ -16,10 +17,34 @@ class User(AbstractUser):
     username = models.CharField(max_length=100)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username','first_name', 'last_name']
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+    def __str__(self) -> str:
+        return f"{self.email} {self.username}"
+    
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(email, password, **extra_fields)
+
 
 class Disability(models.Model):
     DISABILITY_CHOICES = [
@@ -60,7 +85,7 @@ class Fitness(models.Model):
     duration = models.IntegerField(null=True, blank=True)
     intensity_level = models.CharField(max_length=50, null=True, blank=True)  # low, medium, high
     date = models.DateField(auto_now_add=True)  # Date when the workout is logged
-    progress = models.FloatField(default=0.0)  # Progress towards the goal (percentage)
+    progress = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])  # Progress towards the goal (percentage)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.fitness_goal}"
