@@ -1,0 +1,17 @@
+/* src/components/Dashboard.css */
+
+.dashboard {
+    padding: 20px;
+}
+
+.appointment {
+    margin: 10px 0;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.text-center {
+    text-align: center;
+}

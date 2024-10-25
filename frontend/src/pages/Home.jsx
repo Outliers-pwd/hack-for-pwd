@@ -22,6 +22,12 @@ export default function Home() {
                 <Button as={Link} to="/" variant="outline-primary">
                     Continue as Guest
                 </Button>
+                <Button as={Link} to="/onboarding" variant="success">
+                    Get Started
+                </Button>
+                <Button as={Link} to="/dashboard" variant="success">
+    Go to Dashboard
+</Button>
             </div>
         </div>
     );
