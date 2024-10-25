@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Form, Button, Alert } from "react-bootstrap"; // Import Bootstrap components
+import { useNavigate } from "react-router-dom"; // Import useNavigate for redirecting
 
 export default function Login() {
     const [formData, setFormData] = useState({
         email: "",
-        password: ""
+        password: "",
     });
 
     const handleChange = (e) => {
@@ -17,15 +18,15 @@ export default function Login() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState(null);
-    const [error, setError] = useState(null);
+    const [errorMessages, setErrorMessages] = useState([]);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isLoading) {
-            return;
-        }
+        if (isLoading) return;
 
         setIsLoading(true);
+        setErrorMessages([]); // Clear previous errors
 
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/login/", formData);
@@ -33,15 +34,14 @@ export default function Login() {
             setSuccessMessage("Login Successful!");
             localStorage.setItem("accessToken", response.data.tokens.access);
             localStorage.setItem("refreshToken", response.data.tokens.refresh);
+
+            // Redirect to a different page after successful login
+            navigate("/dashboard"); // Change to your desired route
         } catch (error) {
             console.log("Error during Login!", error.response?.data);
             if (error.response && error.response.data) {
-                Object.keys(error.response.data).forEach(field => {
-                    const errorMessages = error.response.data[field];
-                    if (errorMessages && errorMessages.length > 0) {
-                        setError(errorMessages[0]);
-                    }
-                });
+                const errors = Object.values(error.response.data).flat(); // Collect all error messages
+                setErrorMessages(errors);
             }
         } finally {
             setIsLoading(false);
@@ -50,7 +50,13 @@ export default function Login() {
 
     return (
         <div className="container mt-4">
-            {error && <Alert variant="danger">{error}</Alert>}
+            {errorMessages.length > 0 && (
+                <Alert variant="danger">
+                    {errorMessages.map((msg, index) => (
+                        <div key={index}>{msg}</div>
+                    ))}
+                </Alert>
+            )}
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <h2>Login:</h2>
             <Form onSubmit={handleSubmit}>

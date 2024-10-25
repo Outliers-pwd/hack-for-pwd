@@ -19,29 +19,37 @@ export default function Register() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState(null);
-    const [error, setError] = useState(null);
+    const [errorMessages, setErrorMessages] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isLoading) {
+        if (isLoading) return;
+
+        // Validate password match
+        if (formData.password1 !== formData.password2) {
+            setErrorMessages(["Passwords do not match!"]);
             return;
         }
 
         setIsLoading(true);
+        setErrorMessages([]); // Clear previous errors
 
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/register/", formData);
             console.log("Success!", response.data);
             setSuccessMessage("Registration Successful!");
+            // Optionally clear the form
+            setFormData({
+                username: "",
+                email: "",
+                password1: "",
+                password2: "",
+            });
         } catch (error) {
             console.log("Error during registration!", error.response?.data);
             if (error.response && error.response.data) {
-                Object.keys(error.response.data).forEach(field => {
-                    const errorMessages = error.response.data[field];
-                    if (errorMessages && errorMessages.length > 0) {
-                        setError(errorMessages[0]);
-                    }
-                });
+                const errors = Object.values(error.response.data).flat(); // Collect all error messages
+                setErrorMessages(errors);
             }
         } finally {
             setIsLoading(false);
@@ -50,7 +58,13 @@ export default function Register() {
 
     return (
         <div className="container mt-4">
-            {error && <Alert variant="danger">{error}</Alert>}
+            {errorMessages.length > 0 && (
+                <Alert variant="danger">
+                    {errorMessages.map((msg, index) => (
+                        <div key={index}>{msg}</div>
+                    ))}
+                </Alert>
+            )}
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <h2>Register:</h2>
             <Form onSubmit={handleSubmit}>

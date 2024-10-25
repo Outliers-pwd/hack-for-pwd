@@ -40,3 +40,18 @@
   .read-the-docs {
     color: #888;
   }
+
+  /* src/App.css */
+.container {
+  margin-top: 50px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+button {
+  margin: 10px;
+}
