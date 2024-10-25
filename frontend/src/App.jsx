@@ -4,6 +4,8 @@ import Home from "./pages/Home"
 import Layout from './pages/Layout';
 import Register from './pages/Register';
 import Login from './pages/Login'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
 
